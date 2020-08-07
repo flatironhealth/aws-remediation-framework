@@ -1,0 +1,46 @@
+{
+  "detail-type": [
+    "AWS API Call via CloudTrail"
+  ],
+  "detail": {
+    "eventName": [
+      "CreateRole",
+      "UpdateAssumeRolePolicy",
+
+      "CreateQueue",
+      "SetQueueAttributes",
+      "AddPermission",
+
+      "ModifyImageAttribute",
+
+      "ModifySnapshotAttribute",
+
+      "ModifyDBSnapshotAttribute",
+
+      "ModifyDBInstance",
+      "CreateDBInstanceReadReplica",
+      "CreateDBInstance",
+
+      "ModifyCluster",
+      "CreateCluster",
+
+      "CreateBucket",
+      "PutBucketPolicy",
+      "PutBucketAcl",
+
+      "AuthorizeSecurityGroupIngress",
+      "CreateSecurityGroup",
+
+      "RegisterInstancesWithLoadBalancer",
+      "AssociateAddress",
+
+      "RegisterTargets",
+      "CreateListener",
+      "ModifyListener",
+      "RunInstances",
+
+      "AddPermission20150331v2",
+      "CreateFunction20150331"
+    ]
+  }
+}

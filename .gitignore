@@ -1,0 +1,10 @@
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+cache
+venv
+__pycache__
+.coverage
+htmlcov/
+resources/remediator/module_cache/
+*.pyc
