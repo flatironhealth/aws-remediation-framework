@@ -58,6 +58,11 @@ variable "s3_bucket_ignore_list" {
   default = ""
 }
 
+variable "remediation_resource_exception" {
+  description = "list of resources to be marked as exception from remediation"
+  default = ""
+}
+
 variable "remediation_module_exception" {
     type=map
     description = "exception for disabling specific modules for accounts"

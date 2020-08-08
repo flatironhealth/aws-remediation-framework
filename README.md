@@ -187,6 +187,14 @@ terraform destroy
 
 You can also remove the S3 bucket `{bucket-name-prefix}-{region}`.
 
+# Resource and Module Exceptions
+There are multiple variables in ./variables.tf which would mark resources exempt from remediation.
+1. `ec2_ignore_list` -  for ignoring remediation of publicly exposed dev(characterized by accounts in `dev_accounts` variable) ec2   instance(s)
+2. `s3_bucket_ignore_list` - for ignoring remediation of specified S3 bucket.
+3. `remediation_module_exception` - for ignoring remediation module(s) for specific account(s). example - `"123456789012":["ami"]` will disable ami remediation for account 123456789012.
+4. `remediation_resource_exception` - for ignoring remediation for any resource, specify resource identifiers seperated by `,` example: "snap-abcd,ami-abcd" will not remediate the specified resources.
+
+TODO - remove 1 and 2 and make 4 a key based exception list - {"s3":["test-bucket-1","test-bucket-2"],"ami":"ami-abcd"}  
 
 # Testing
 Unit tests can be run with:
