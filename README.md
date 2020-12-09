@@ -72,8 +72,8 @@ There are some manual steps which needs to be done before you setup the master a
     }
 
     variable "org_account" {
-      description = "account id of Organization account"
-      default = "org-account-id"
+      description = "list of account ids for organization accounts"
+      default = "org-account-id-1,org-account-id-2"
     }
 
     variable "dev_accounts" {
