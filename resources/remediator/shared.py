@@ -57,19 +57,25 @@ def depaginate_accounts(boto_handle):
 
 
 def fetch_all_accounts():
-    # Assume a role into the Org master, and then list all the accounts in the Org.
+    # Assume a role into the org accounts, and then return all the accounts in the Org.
     # If we do not have access to the Org master, then only return the known accounts.
+    all_accounts=[]
     try:
-        aws_org_account = os.environ["ORGANIZATION_ACCOUNT"]
-        org = get_session_for_account(
-            aws_org_account, # Organization root account
-            "us-east-1",
-            "organizations",
-            role="member_remediator",
-            custom_session_name="fetch-accounts-" + aws_org_account,
-        )
-        response = depaginate_accounts(org)
-        return response
+        if os.environ.get("ORGANIZATION_ACCOUNT", None) is not None:
+            org_accounts = os.environ["ORGANIZATION_ACCOUNT"].split(",")
+        else:
+            org_accounts=None
+        for aws_org_account in org_accounts:
+            org = get_session_for_account(
+                aws_org_account, # Organization root account
+                "us-east-1",
+                "organizations",
+                role="member_remediator",
+                custom_session_name="fetch-accounts-" + aws_org_account,
+            )
+            response = depaginate_accounts(org)
+            all_accounts = all_accounts + response
+        return all_accounts
     except Exception as e:
         print(f'Unable to list accounts: {e}')
         return os.environ["KNOWN_ACCOUNTS"]

@@ -29,7 +29,7 @@ variable "dev_accounts" {
 }
 
 variable "org_account" {
-  description = "account id of Organization account"
+  description = "list of account ids for organization accounts"
   default = ""
 }
 
