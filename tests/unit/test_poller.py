@@ -31,7 +31,7 @@ class TestPoller(TestCase):
 
                 def describe_security_groups(self, *arg, **kwargs):
                     return {"SecurityGroups": []}
-                
+
                 def can_paginate(self, method):
                     return False
 
@@ -41,7 +41,7 @@ class TestPoller(TestCase):
 
                 def list_roles(self, *arg, **kwargs):
                     return {"Roles": []}
-                
+
                 def can_paginate(self, method):
                     return False
 
@@ -51,28 +51,28 @@ class TestPoller(TestCase):
 
                 def describe_db_snapshots(self, *arg, **kwargs):
                     return {"DBSnapshots": []}
-                
+
                 def can_paginate(self, method):
                     return False
 
             class S3:
                 def list_buckets(self, *arg, **kwargs):
                     return {"Buckets": []}
-                
+
                 def can_paginate(self, method):
                     return False
 
             class Redshift:
                 def describe_clusters(self, *arg, **kwargs):
                     return {"Clusters": []}
-                
+
                 def can_paginate(self, method):
                     return False
 
             class Elb:
                 def describe_load_balancers(self, *arg, **kwargs):
                     return {"LoadBalancerDescriptions": []}
-                
+
                 def can_paginate(self, method):
                     return False
 
@@ -82,6 +82,26 @@ class TestPoller(TestCase):
 
                 def can_paginate(self, method):
                     return False
+
+            class Ecs:
+                def describe_services(self, *arg, **kwargs):
+                    return {"Services": []}
+
+                def describe_tasks(self, *arg, **kwargs):
+                    return {"Task": []}
+
+                def list_tasks(self, *arg, **kwargs):
+                    return {"TasksArns": []}
+
+                def list_clusters(self, *arg, **kwargs):
+                    return {"ClusterArns": []}
+
+                def describe_task_sets(self, *arg, **kwargs):
+                    return {"TaskSets": []}
+
+                def can_paginate(self, method):
+                    return False
+
 
             if service == "sqs":
                 return Sqs()
@@ -99,6 +119,8 @@ class TestPoller(TestCase):
                 return Elb()
             elif service == "lambda":
                 return Lambda()
+            elif service == "ecs":
+                return Ecs()
             else:
                 raise Exception("Unknown service: {}".format(service))
 

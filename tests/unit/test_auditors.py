@@ -37,7 +37,7 @@ class TestAuditors(TestCase):
                     else:
                         raise Exception("Unexpected image id {}".format(ImageId))
 
-                def modify_image_attribute(Attribute, LaunchPermission, ImageId):
+                def modify_image_attribute(self, Attribute, LaunchPermission, ImageId):
                     return True
 
                 # EBS snapshots
@@ -58,7 +58,7 @@ class TestAuditors(TestCase):
                         raise Exception("Unexpected snapshot id {}".format(SnapshotId))
 
                 def modify_snapshot_attribute(
-                        self, Attribute, CreateVolumePermission, SnapshotId
+                    self, Attribute, CreateVolumePermission, SnapshotId
                 ):
                     return True
 
@@ -76,12 +76,18 @@ class TestAuditors(TestCase):
                                                 "HttpEndpoint": "enabled",
                                             },
                                             "Tags": [
-                                                {"Key": "department", "Value": "example"},
+                                                {
+                                                    "Key": "department",
+                                                    "Value": "example",
+                                                },
                                                 {
                                                     "Key": "Name",
                                                     "Value": "example",
                                                 },
-                                                {"Key": "application", "Value": "example"},
+                                                {
+                                                    "Key": "application",
+                                                    "Value": "example",
+                                                },
                                             ],
                                             "State": {"Code": 16, "Name": "running"},
                                         }
@@ -102,7 +108,10 @@ class TestAuditors(TestCase):
                                                 "HttpEndpoint": "enabled",
                                             },
                                             "Tags": [
-                                                {"Key": "application", "Value": "example"}
+                                                {
+                                                    "Key": "application",
+                                                    "Value": "example",
+                                                }
                                             ],
                                             "State": {"Code": 16, "Name": "running"},
                                         }
@@ -114,7 +123,7 @@ class TestAuditors(TestCase):
                         raise Exception("Unexpected instance id {}".format(InstanceIds))
 
                 def modify_instance_metadata_options(
-                        self, InstanceId, HttpTokens, HttpEndpoint
+                    self, InstanceId, HttpTokens, HttpEndpoint
                 ):
                     return True
 
@@ -168,6 +177,7 @@ class TestAuditors(TestCase):
 
                 def terminate_instances(self, InstanceIds, dryrun):
                     return True
+
                 def describe_security_groups(self, GroupIds):
                     if "sg-ok" in GroupIds:
                         return {
@@ -181,7 +191,10 @@ class TestAuditors(TestCase):
                                     "IpPermissionsEgress": [],
                                     "Tags": [
                                         {"Key": "department", "Value": "security"},
-                                        {"Key": "application", "Value": "remediation-framework"},
+                                        {
+                                            "Key": "application",
+                                            "Value": "remediation-framework",
+                                        },
                                         {
                                             "Key": "Name",
                                             "Value": "misconfiguration_maker",
@@ -217,7 +230,10 @@ class TestAuditors(TestCase):
                                     "IpPermissionsEgress": [],
                                     "Tags": [
                                         {"Key": "department", "Value": "security"},
-                                        {"Key": "application", "Value": "remediation-framework"},
+                                        {
+                                            "Key": "application",
+                                            "Value": "remediation-framework",
+                                        },
                                         {
                                             "Key": "Name",
                                             "Value": "misconfiguration_maker",
@@ -232,6 +248,59 @@ class TestAuditors(TestCase):
                             ]
                         }
 
+                def describe_network_interfaces(self, **kwargs):
+                    eni_definition = {
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use",
+                                "MacAddress": "8e:d8:f1:3c:d7:3b",
+                                "SourceDestCheck": True,
+                                "VpcId": "vpc-a01106c2",
+                                "Description": "my network interface",
+                                "Association": {
+                                    "PublicIp": "203.0.113.12",
+                                    "AssociationId": "eipassoc-0fbb766a",
+                                    "PublicDnsName": "ec2-203-0-113-12.compute-1.amazonaws.com",
+                                    "IpOwnerId": "123456789012",
+                                },
+                                "NetworkInterfaceId": "eni-e5aa89a3",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-10-0-1-17.ec2.internal",
+                                        "Association": {
+                                            "PublicIp": "203.0.113.12",
+                                            "AssociationId": "eipassoc-0fbb766a",
+                                            "PublicDnsName": "ec2-203-0-113-12.compute-1.amazonaws.com",
+                                            "IpOwnerId": "123456789012",
+                                        },
+                                        "Primary": True,
+                                        "PrivateIpAddress": "10.0.1.17",
+                                    }
+                                ],
+                                "RequesterManaged": False,
+                                "Ipv6Addresses": [],
+                                "PrivateDnsName": "ip-10-0-1-17.ec2.internal",
+                                "AvailabilityZone": "us-east-1d",
+                                "Attachment": {
+                                    "Status": "attached",
+                                    "DeviceIndex": 1,
+                                    "AttachTime": "2013-11-30T23:36:42.000Z",
+                                    "InstanceId": "i-1234567890abcdef0",
+                                    "DeleteOnTermination": False,
+                                    "AttachmentId": "eni-attach-66c4350a",
+                                    "InstanceOwnerId": "123456789012",
+                                },
+                                "Groups": [
+                                    {"GroupName": "default", "GroupId": "sg-8637d3e3"}
+                                ],
+                                "SubnetId": "subnet-b61f49f0",
+                                "OwnerId": "123456789012",
+                                "TagSet": [],
+                                "PrivateIpAddress": "10.0.1.17",
+                            }
+                        ]
+                    }
+                    return eni_definition
 
             class Sqs:
                 def get_queue_attributes(self, QueueUrl, AttributeNames):
@@ -246,8 +315,8 @@ class TestAuditors(TestCase):
                         # Return private policy
                         return {"Attributes": {}}
                     elif (
-                            QueueUrl
-                            == "https://queue.amazonaws.com/123456789012/misconfiguration_maker-bad"
+                        QueueUrl
+                        == "https://queue.amazonaws.com/123456789012/misconfiguration_maker-bad"
                     ):
                         # Return public policy
                         return {
@@ -462,14 +531,23 @@ class TestAuditors(TestCase):
                                 "RoleId": "AROARVZZW3RWCNVIYDBCN",
                                 "Arn": "arn:aws:iam::123456789012:role/restricted",
                                 "CreateDate": datetime.datetime(2015, 1, 1),
-                                "AssumeRolePolicyDocument": {"Version": "2012-10-17", "Statement": [
-                                    {"Sid": "Restricted", "Effect": "Allow",
-                                     "Principal": {"Service": "ec2.amazonaws.com"}, "Action": "sts:AssumeRole"}]},
+                                "AssumeRolePolicyDocument": {
+                                    "Version": "2012-10-17",
+                                    "Statement": [
+                                        {
+                                            "Sid": "Restricted",
+                                            "Effect": "Allow",
+                                            "Principal": {
+                                                "Service": "ec2.amazonaws.com"
+                                            },
+                                            "Action": "sts:AssumeRole",
+                                        }
+                                    ],
+                                },
                                 "Description": "Restricted IAM role",
                                 "MaxSessionDuration": 3600,
-                                "RoleLastUsed": {}
+                                "RoleLastUsed": {},
                             }
-
                         }
 
                     if RoleName == "overpermissive":
@@ -480,12 +558,20 @@ class TestAuditors(TestCase):
                                 "RoleId": "AROARVZZW3RWCNVIYDBCN",
                                 "Arn": "arn:aws:iam::123456789012:role/overpermissive",
                                 "CreateDate": datetime.datetime(2015, 1, 1),
-                                "AssumeRolePolicyDocument": {"Version": "2012-10-17", "Statement": [
-                                    {"Sid": "overpermissive", "Effect": "Allow",
-                                     "Principal": {"AWS": "*"}, "Action": "sts:AssumeRole"}]},
+                                "AssumeRolePolicyDocument": {
+                                    "Version": "2012-10-17",
+                                    "Statement": [
+                                        {
+                                            "Sid": "overpermissive",
+                                            "Effect": "Allow",
+                                            "Principal": {"AWS": "*"},
+                                            "Action": "sts:AssumeRole",
+                                        }
+                                    ],
+                                },
                                 "Description": "Over permissive IAM role",
                                 "MaxSessionDuration": 3600,
-                                "RoleLastUsed": {}
+                                "RoleLastUsed": {},
                             }
                         }
 
@@ -543,7 +629,10 @@ class TestAuditors(TestCase):
                         return {
                             "TagList": [
                                 {"Key": "App", "Value": "misconfiguration_maker"},
-                                {"Key": "application", "Value": "remediation-framework"},
+                                {
+                                    "Key": "application",
+                                    "Value": "remediation-framework",
+                                },
                                 {"Key": "department", "Value": "security"},
                                 {"Key": "Name", "Value": "misconfiguration_maker"},
                             ]
@@ -553,7 +642,7 @@ class TestAuditors(TestCase):
                     return True
 
                 def modify_db_instance(
-                        self, DBInstanceIdentifier, PubliclyAccessible, ApplyImmediately
+                    self, DBInstanceIdentifier, PubliclyAccessible, ApplyImmediately
                 ):
                     return True
 
@@ -571,7 +660,7 @@ class TestAuditors(TestCase):
                     }
 
                 def modify_db_snapshot_attribute(
-                        self, DBSnapshotIdentifier, AttributeName, ValuesToRemove
+                    self, DBSnapshotIdentifier, AttributeName, ValuesToRemove
                 ):
                     return True
 
@@ -608,7 +697,10 @@ class TestAuditors(TestCase):
                         return {
                             "TagSet": [
                                 {"Key": "App", "Value": "misconfiguration_maker"},
-                                {"Key": "application", "Value": "remediation-framework"},
+                                {
+                                    "Key": "application",
+                                    "Value": "remediation-framework",
+                                },
                                 {"Key": "department", "Value": "security"},
                                 {"Key": "Name", "Value": "misconfiguration_maker"},
                             ]
@@ -650,7 +742,7 @@ class TestAuditors(TestCase):
                     }
 
                 def modify_cluster(
-                        self, ClusterIdentifier, PubliclyAccessible=None, Encrypted=None
+                    self, ClusterIdentifier, PubliclyAccessible=None, Encrypted=None
                 ):
                     return True
 
@@ -716,7 +808,7 @@ class TestAuditors(TestCase):
                                 },
                                 "BackendServerDescriptions": [],
                                 "AvailabilityZones": ["us-east-1a", "us-east-1b"],
-                                "Subnets": ["subnet-5bac2c70", "subnet-8c820ae9"],
+                                "Subnets": ["subnet-567890", "subnet-7890123"],
                                 "VPCId": "vpc-a01106c2",
                                 "Instances": [{"InstanceId": "i-ok"}],
                                 "HealthCheck": {
@@ -730,7 +822,7 @@ class TestAuditors(TestCase):
                                     "OwnerAlias": "123456789012",
                                     "GroupName": "default_elb_52d611ed-5eb9-3bd9-af0d-11b512735546",
                                 },
-                                "SecurityGroups": ["sg-04a33d6495f4c157a"],
+                                "SecurityGroups": ["sg-903004f8"],
                                 "CreatedTime": "2019-12-26T19:45:06.390Z",
                                 "Scheme": "internet-facing",
                             }
@@ -781,14 +873,135 @@ class TestAuditors(TestCase):
 
             class Elbv2:
                 def describe_load_balancers(self, LoadBalancerNames):
-                    return {'LoadBalancers': [{'LoadBalancerArn': 'arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/dummy-lb/abcdefg012345678', 'DNSName': 'dummy-lb-704041262.us-east-1.elb.amazonaws.com', 'CanonicalHostedZoneId': 'Z35SXDOTRQ7X7K', 'CreatedTime': datetime.datetime(2020, 3, 19, 16, 17, 37, 550000, tzinfo=tzutc()), 'LoadBalancerName': 'dummy-lb', 'Scheme': 'internet-facing', 'VpcId': 'vpc-3aba925f', 'State': {'Code': 'active'}, 'Type': 'application', 'AvailabilityZones': [{'ZoneName': 'us-east-1b', 'SubnetId': 'subnet-5bac2c70', 'LoadBalancerAddresses': []}, {'ZoneName': 'us-east-1d', 'SubnetId': 'subnet-1234567', 'LoadBalancerAddresses': []}, {'ZoneName': 'us-east-1a', 'SubnetId': 'subnet-1234567', 'LoadBalancerAddresses': []}], 'SecurityGroups': ['sg-abc123'], 'IpAddressType': 'ipv4'}], 'ResponseMetadata': {'RequestId': '3daa02db-e964-49c5-9bf1-3ac34a22a6c8', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amzn-requestid': '3daa02db-e964-49c5-9bf1-3ac34a22a6c8', 'content-type': 'text/xml', 'content-length': '1717', 'date': 'Wed, 05 Aug 2020 15:20:25 GMT'}, 'RetryAttempts': 0}}
+                    return {
+                        "LoadBalancers": [
+                            {
+                                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/dummy-lb/abcdefg012345678",
+                                "DNSName": "dummy-lb-704041262.us-east-1.elb.amazonaws.com",
+                                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K",
+                                "CreatedTime": datetime.datetime(
+                                    2020, 3, 19, 16, 17, 37, 550000, tzinfo=tzutc()
+                                ),
+                                "LoadBalancerName": "dummy-lb",
+                                "Scheme": "internet-facing",
+                                "VpcId": "vpc-3aba925f",
+                                "State": {"Code": "active"},
+                                "Type": "application",
+                                "AvailabilityZones": [
+                                    {
+                                        "ZoneName": "us-east-1b",
+                                        "SubnetId": "subnet-567890",
+                                        "LoadBalancerAddresses": [],
+                                    },
+                                    {
+                                        "ZoneName": "us-east-1d",
+                                        "SubnetId": "subnet-1234567",
+                                        "LoadBalancerAddresses": [],
+                                    },
+                                    {
+                                        "ZoneName": "us-east-1a",
+                                        "SubnetId": "subnet-1234567",
+                                        "LoadBalancerAddresses": [],
+                                    },
+                                ],
+                                "SecurityGroups": ["sg-abc123"],
+                                "IpAddressType": "ipv4",
+                            }
+                        ],
+                        "ResponseMetadata": {
+                            "RequestId": "3daa02db-e964-49c5-9bf1-3ac34a22a6c8",
+                            "HTTPStatusCode": 200,
+                            "HTTPHeaders": {
+                                "x-amzn-requestid": "3daa02db-e964-49c5-9bf1-3ac34a22a6c8",
+                                "content-type": "text/xml",
+                                "content-length": "1717",
+                                "date": "Wed, 05 Aug 2020 15:20:25 GMT",
+                            },
+                            "RetryAttempts": 0,
+                        },
+                    }
 
                 def describe_target_groups(self, LoadBalancerNames):
-                    return {'TargetGroups': [{'TargetGroupArn': 'arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/abc/7f895d339258b7ce', 'TargetGroupName': 'abc', 'Protocol': 'HTTP', 'Port': 80, 'VpcId': 'vpc-abc123', 'HealthCheckProtocol': 'HTTP', 'HealthCheckPort': 'traffic-port', 'HealthCheckEnabled': True, 'HealthCheckIntervalSeconds': 30, 'HealthCheckTimeoutSeconds': 5, 'HealthyThresholdCount': 5, 'UnhealthyThresholdCount': 2, 'HealthCheckPath': '/', 'Matcher': {'HttpCode': '200'}, 'LoadBalancerArns': ['arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/dummy-alb/81315df077712965'], 'TargetType': 'instance'}, {'TargetGroupArn': 'arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/dummy/1234abcdef', 'TargetGroupName': 'dummy', 'Protocol': 'HTTP', 'Port': 80, 'VpcId': 'vpc-abc123', 'HealthCheckProtocol': 'HTTP', 'HealthCheckPort': 'traffic-port', 'HealthCheckEnabled': True, 'HealthCheckIntervalSeconds': 30, 'HealthCheckTimeoutSeconds': 5, 'HealthyThresholdCount': 5, 'UnhealthyThresholdCount': 2, 'HealthCheckPath': '/', 'Matcher': {'HttpCode': '200'}, 'LoadBalancerArns': ['arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/dummy-alb/81315df077712965'], 'TargetType': 'instance'}, {'TargetGroupArn': 'arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/dummy-alb/6a5570e2c3c31fa2', 'TargetGroupName': 'dummy-alb', 'Protocol': 'HTTP', 'Port': 80, 'VpcId': 'vpc-abc123', 'HealthCheckProtocol': 'HTTP', 'HealthCheckPort': 'traffic-port', 'HealthCheckEnabled': True, 'HealthCheckIntervalSeconds': 30, 'HealthCheckTimeoutSeconds': 5, 'HealthyThresholdCount': 5, 'UnhealthyThresholdCount': 2, 'HealthCheckPath': '/', 'Matcher': {'HttpCode': '200'}, 'LoadBalancerArns': ['arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/dummy-alb/81315df077712965'], 'TargetType': 'instance'}], 'ResponseMetadata': {'RequestId': '332e451e-d501-4bda-8270-f55e481f3269', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amzn-requestid': '332e451e-d501-4bda-8270-f55e481f3269', 'content-type': 'text/xml', 'content-length': '3563', 'vary': 'accept-encoding', 'date': 'Wed, 05 Aug 2020 15:36:41 GMT'}, 'RetryAttempts': 0}}
-
+                    return {
+                        "TargetGroups": [
+                            {
+                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/abc/7f895d339258b7ce",
+                                "TargetGroupName": "abc",
+                                "Protocol": "HTTP",
+                                "Port": 80,
+                                "VpcId": "vpc-abc123",
+                                "HealthCheckProtocol": "HTTP",
+                                "HealthCheckPort": "traffic-port",
+                                "HealthCheckEnabled": True,
+                                "HealthCheckIntervalSeconds": 30,
+                                "HealthCheckTimeoutSeconds": 5,
+                                "HealthyThresholdCount": 5,
+                                "UnhealthyThresholdCount": 2,
+                                "HealthCheckPath": "/",
+                                "Matcher": {"HttpCode": "200"},
+                                "LoadBalancerArns": [
+                                    "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/dummy-alb/81315df077712965"
+                                ],
+                                "TargetType": "instance",
+                            },
+                            {
+                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/dummy/1234abcdef",
+                                "TargetGroupName": "dummy",
+                                "Protocol": "HTTP",
+                                "Port": 80,
+                                "VpcId": "vpc-abc123",
+                                "HealthCheckProtocol": "HTTP",
+                                "HealthCheckPort": "traffic-port",
+                                "HealthCheckEnabled": True,
+                                "HealthCheckIntervalSeconds": 30,
+                                "HealthCheckTimeoutSeconds": 5,
+                                "HealthyThresholdCount": 5,
+                                "UnhealthyThresholdCount": 2,
+                                "HealthCheckPath": "/",
+                                "Matcher": {"HttpCode": "200"},
+                                "LoadBalancerArns": [
+                                    "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/dummy-alb/81315df077712965"
+                                ],
+                                "TargetType": "instance",
+                            },
+                            {
+                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/dummy-alb/6a5570e2c3c31fa2",
+                                "TargetGroupName": "dummy-alb",
+                                "Protocol": "HTTP",
+                                "Port": 80,
+                                "VpcId": "vpc-abc123",
+                                "HealthCheckProtocol": "HTTP",
+                                "HealthCheckPort": "traffic-port",
+                                "HealthCheckEnabled": True,
+                                "HealthCheckIntervalSeconds": 30,
+                                "HealthCheckTimeoutSeconds": 5,
+                                "HealthyThresholdCount": 5,
+                                "UnhealthyThresholdCount": 2,
+                                "HealthCheckPath": "/",
+                                "Matcher": {"HttpCode": "200"},
+                                "LoadBalancerArns": [
+                                    "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/dummy-alb/81315df077712965"
+                                ],
+                                "TargetType": "instance",
+                            },
+                        ],
+                        "ResponseMetadata": {
+                            "RequestId": "332e451e-d501-4bda-8270-f55e481f3269",
+                            "HTTPStatusCode": 200,
+                            "HTTPHeaders": {
+                                "x-amzn-requestid": "332e451e-d501-4bda-8270-f55e481f3269",
+                                "content-type": "text/xml",
+                                "content-length": "3563",
+                                "vary": "accept-encoding",
+                                "date": "Wed, 05 Aug 2020 15:36:41 GMT",
+                            },
+                            "RetryAttempts": 0,
+                        },
+                    }
 
             class Guardduty:
-                self.account = '123456789012'
+                self.account = "123456789012"
+
                 def list_detectors(self):
                     if region == "us-east-1":
                         return {"DetectorIds": ["12abc34d567e8fa901bc2d34eexample"]}
@@ -865,16 +1078,16 @@ class TestAuditors(TestCase):
                                         "ArnLike": {
                                             "AWS:SourceArn": "arn:aws:execute-api:us-east-1:123456789012:abcxpaoxyz/*/*/misconfig-maker-lambda"
                                         }
-                                    }
+                                    },
                                 },
                                 {
                                     "Sid": "si34",
                                     "Effect": "Allow",
                                     "Principal": "*",
                                     "Action": "lambda:InvokeFunction",
-                                    "Resource": "arn:aws:lambda:us-east-1:123456789012:function:misconfig-maker-lambda"
-                                }
-                            ]
+                                    "Resource": "arn:aws:lambda:us-east-1:123456789012:function:misconfig-maker-lambda",
+                                },
+                            ],
                         }
                         return {"Policy": json.dumps(policy)}
 
@@ -895,13 +1108,149 @@ class TestAuditors(TestCase):
                                         "ArnLike": {
                                             "AWS:SourceArn": "arn:aws:execute-api:us-east-1:123456789012:abcxpaoxyz/*/*/misconfig-maker-lambda"
                                         }
-                                    }
+                                    },
                                 }
-                            ]
+                            ],
                         }
                         return {"Policy": json.dumps(policy)}
 
                 def remove_permission(self, FunctionName, StatementId):
+                    return True
+
+            class Ecs:
+                def describe_services(self, cluster, services):
+                    if "bad" in services:
+                        service_desc = {
+                            "services": [
+                                {
+                                    "serviceName": "bad",
+                                    "networkConfiguration": {
+                                        "awsvpcConfiguration": {
+                                            "subnets": [
+                                                "subnet-567890",
+                                                "subnet-7890123",
+                                            ],
+                                            "securityGroups": ["sg-903004f8"],
+                                            "assignPublicIp": "ENABLED",
+                                        }
+                                    },
+                                },
+                            ]
+                        }
+                        return service_desc
+
+                    else:
+                        service_desc = {
+                            "services": [
+                                {
+                                    "serviceName": services,
+                                    "networkConfiguration": {
+                                        "awsvpcConfiguration": {
+                                            "subnets": [
+                                                "subnet-567890",
+                                                "subnet-7890123",
+                                            ],
+                                            "securityGroups": ["sg-903004f8"],
+                                            "assignPublicIp": "DISABLED",
+                                        }
+                                    },
+                                },
+                            ]
+                        }
+                        return service_desc
+
+                def list_clusters(self):
+                    clusters = {
+                        "clusterArns": [
+                            "arn:aws:ecs:us-east-1:123456789012:cluster/misconfiguration-maker"
+                        ]
+                    }
+                    return clusters
+
+                def list_tasks(self, **kwargs):
+                    tasks = {
+                        "taskArns": [
+                            "arn:aws:ecs:us-east-1:123456789012:task/1234567890123456789"
+                        ]
+                    }
+                    return tasks
+
+                def describe_tasks(self, **kwargs):
+                    task = {
+                        "tasks": [
+                            {
+                                "attachments": [
+                                    {
+                                        "details": [
+                                            {
+                                                "name": "networkInterfaceId",
+                                                "value": "eni***",
+                                            }
+                                        ],
+                                        "status": "string",
+                                        "type": "ElasticNetworkInterface",
+                                    }
+                                ],
+                                "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/1234567890123456789",
+                                "taskDefinitionArn": "arn:aws:ecs:us-east-1:123456789012:task-definition/misconfiguration-alpine:latest",
+                            }
+                        ]
+                    }
+                    return task
+
+                def describe_task_sets(self, cluster, service, task_sets):
+                    bad_task_sets = {
+                        "taskSets": [
+                            {
+                                "networkConfiguration": {
+                                    "awsvpcConfiguration": {
+                                        "assignPublicIp": "ENABLED",
+                                        "securityGroups": ["sg-903004f8"],
+                                        "subnets": ["subnet-567890", "subnet-7890123"],
+                                    }
+                                },
+                                "id": "NONE",
+                            }
+                        ]
+                    }
+                    if "bad" in task_sets:
+                        return bad_task_sets
+
+                    else:
+                        good_task_sets = {
+                            "taskSets": [
+                                {
+                                    "networkConfiguration": {
+                                        "awsvpcConfiguration": {
+                                            "assignPublicIp": "DISABLED",
+                                            "securityGroups": ["sg-903004f8"],
+                                            "subnets": [
+                                                "subnet-567890",
+                                                "subnet-7890123",
+                                            ],
+                                        }
+                                    },
+                                    "id": "NONE",
+                                }
+                            ]
+                        }
+                        return good_task_sets
+
+                def list_services(self, **kwargs):
+                    services = {
+                        "serviceArns": [
+                            "arn:aws:ecs:us-east-1:123456789012:service/1234567890123456789"
+                        ]
+                    }
+                    return services
+
+                def stop_task(self, **kwargs):
+                    return True
+
+                def delete_task_set(self, **kwargs):
+                    return True
+
+                def update_service(self, **kwargs):
                     return True
 
             if service == "ec2":
@@ -918,7 +1267,7 @@ class TestAuditors(TestCase):
                 return Redshift()
             elif service == "elb":
                 return Elb()
-            elif service == 'elbv2':
+            elif service == "elbv2":
                 return Elbv2()
             elif service == "guardduty":
                 return Guardduty()
@@ -928,6 +1277,8 @@ class TestAuditors(TestCase):
                 return Cloudtrail()
             elif service == "lambda":
                 return Lambda()
+            elif service == "ecs":
+                return Ecs()
             else:
                 raise Exception("Unknown service: {}".format(service))
 
@@ -949,7 +1300,9 @@ class TestAuditors(TestCase):
             mocked_get_session_for_account_side_effect
         )
 
-        self.mocked_send_notification = mock.patch("shared.send_notification").__enter__()
+        self.mocked_send_notification = mock.patch(
+            "shared.send_notification"
+        ).__enter__()
         self.mocked_send_notification.side_effect = mocked_send_notification_side_effect
 
         self.mocked_boto3_client = mock.patch("boto3.client").__enter__()
@@ -1283,7 +1636,6 @@ class TestAuditors(TestCase):
         resource_message["id"] = "bad"
         assert_false(elbv2.audit(resource_message, remediate=True))
 
-
     def test_handler(self):
         from resources.remediator.main import handler
 
@@ -1325,3 +1677,43 @@ class TestAuditors(TestCase):
         resource_message["id"] = "bad"
         assert_false(lambda_function.audit(resource_message, remediate=True))
         return True
+
+    def test_ecs_service(self):
+        # Import the module to test
+        from resources.remediator.auditors import ecs_service
+
+        resource_message = {
+            "account": "123456789012",
+            "region": "us-east-1",
+            "type": "ecs_service",
+            "id": "bad",
+        }
+        assert_true(ecs_service.audit(resource_message, remediate=True))
+        resource_message["id"] = "good"
+        assert_true(ecs_service.audit(resource_message, remediate=True))
+
+    def test_ecs_task(self):
+        from resources.remediator.auditors import ecs_task
+
+        resource_message = {
+            "account": "123456789012",
+            "region": "us-east-1",
+            "type": "ecs_task",
+            "id": "bad",
+        }
+        assert_true(ecs_task.audit(resource_message, remediate=True))
+        resource_message["id"] = "good"
+        assert_true(ecs_task.audit(resource_message, remediate=True))
+
+    def test_ecs_task_set(self):
+        from resources.remediator.auditors import ecs_task_set
+
+        resource_message = {
+            "account": "123456789012",
+            "region": "us-east-1",
+            "type": "ecs_task_set",
+            "id": "bad",
+        }
+        assert_true(ecs_task_set.audit(resource_message, remediate=True))
+        resource_message["id"] = "good"
+        assert_true(ecs_task_set.audit(resource_message, remediate=True))

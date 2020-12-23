@@ -474,6 +474,86 @@ def main():
                         ),
                     )
 
+            # Look at ECS Tasks
+            ecs = get_session_for_account(account_id, region, "ecs")
+            all_services = paginate_call(ecs, "describe_services", {})
+            for service in all_services.get("Services", [] ):
+                if only_use_test_resources:
+                    if "misconfig" in service["serviceName"]:
+                        output_resource(
+                            sqs_for_output,
+                            sqs_output,
+                            Resource(
+                                account_id,
+                                region,
+                                "ecs_service",
+                                service["serviceName"],
+                            ),
+                        )
+                else:
+                    output_resource(
+                        sqs_for_output,
+                        sqs_output,
+                        Resource(
+                            account_id,
+                            region,
+                            "ecs_service",
+                            service["serviceName"],
+                        ),
+                    )
+            ## Look at ECS Task Sets
+            all_task_sets = paginate_call(ecs, "describe_task_sets", {})
+            for task_set in all_task_sets.get("taskSets", [] ):
+                if only_use_test_resources:
+                    if "misconfig" in task_set["id"]:
+                        output_resource(
+                            sqs_for_output,
+                            sqs_output,
+                            Resource(
+                                account_id,
+                                region,
+                                "ecs_task_set",
+                                task_set["id"],
+                            ),
+                        )
+                else:
+                    output_resource(
+                        sqs_for_output,
+                        sqs_output,
+                        Resource(
+                            account_id,
+                            region,
+                            "ecs_task_set",
+                            task_set["id"],
+                        ),
+                    )
+            ## Look at ECS Tasks
+            all_tasks = paginate_call(ecs, "describe_tasks", {})
+            for task in all_tasks.get("tasks", [] ):
+                if only_use_test_resources:
+                    if "misconfig" in task["taskDefinitionArn"]:
+                        output_resource(
+                            sqs_for_output,
+                            sqs_output,
+                            Resource(
+                                account_id,
+                                region,
+                                "ecs_task",
+                                task["taskDefinitionArn"],
+                            ),
+                        )
+                else:
+                    output_resource(
+                        sqs_for_output,
+                        sqs_output,
+                        Resource(
+                            account_id,
+                            region,
+                            "ecs_task",
+                            task["taskDefinitionArn"],
+                        ),
+                    )   
+
             # Look at Region
             output_resource(
                 sqs_for_output, sqs_output, Resource(account_id, region, "region", ""),

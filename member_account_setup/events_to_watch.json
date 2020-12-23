@@ -40,7 +40,16 @@
       "RunInstances",
 
       "AddPermission20150331v2",
-      "CreateFunction20150331"
+      "CreateFunction20150331",
+
+      "CreateService",
+      "UpdateService",
+      "CreateCluster",
+      "PutAttributes",
+      "CreateTaskSet",
+      "UpdateTaskSet",
+      "RunTask",
+      "StartTask"
     ]
   }
 }

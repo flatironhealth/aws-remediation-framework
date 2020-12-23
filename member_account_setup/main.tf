@@ -142,7 +142,24 @@ data "aws_iam_policy_document" "member_remediator_policy_document" {
       "lambda:RemovePermission",
 
       # organizations
-      "organizations:ListAccounts"
+      "organizations:ListAccounts",
+
+      # ECS
+      "ecs:ListClusters",
+      "ecs:ListServices",
+      "ecs:ListTasks",
+      "ecs:DescribeServices",
+      "ecs:DescribeClusters",
+      "ecs:DescribeTasks",
+      "ecs:DescribeTaskSet",
+      "ecs:UpdateTaskSet",
+      "ecs:DeleteTaskSet",
+      "ecs:UpdateService",
+      "ecs:CreateService",
+      "ecs:CreateCluster",
+      "ecs:PutAttributes",
+      "ecs:StopTask"
+
     ]
     resources = [
       "*",

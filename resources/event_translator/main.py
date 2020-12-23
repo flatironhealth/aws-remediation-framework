@@ -213,6 +213,51 @@ def translate_event(event):
         resource["id"] = event["detail"]["requestParameters"]["functionName"]
         return [resource]
 
+        # ECS
+    elif eventName == "CreateService":
+        resource["type"] =  "ecs_service"
+        resource["id"]   = event["detail"]["requestParameters"]["serviceName"]
+        return [resource]
+
+    elif eventName == "UpdateService":
+        resource["type"] =  "ecs_service"
+        resource["id"]   = event["detail"]["requestParameters"]["name"]
+        return [resource]
+
+    elif eventName == "CreateCluster":
+        if eventSource == "ecs.amazonaws.com":
+            resource["type"] =  "ecs_cluster"
+            resource["id"]   = event["detail"]["requestParameters"]["clusterName"]
+            return [resource]
+        else:
+            return []
+
+    elif eventName == "CreateTaskSet":
+        resource["type"] =  "ecs_task_set"
+        resource["id"]   = event["detail"]["requestParameters"]["externalId"]
+        return [resource]
+
+    elif eventName == "UpdateTaskSet":
+        resource["type"] =  "ecs_task_set"
+        resource["id"]   = event["detail"]["requestParameters"]["taskSet"]
+        return [resource]
+
+    elif eventName == "UpdatePrimaryTaskSet":
+        resource["type"] = "ecs_task_set"
+        resource["id"] = event["detail"]["requestParameters"]["primaryTaskSet"]
+        return [resource]
+
+    elif eventName == "RunTask":
+        resource["type"] = "ecs_task"
+        resource["id"] = event["detail"]["requestParameters"]["taskDefinition"]
+        return [resource]
+
+    elif eventName == "StartTask":
+        resource["type"] = "ecs_task"
+        resource["id"] = event["detail"]["requestParameters"]["taskDefinition"]
+        return [resource]
+
+
     else:
         raise Exception("Unexpected event: {}".format(eventName))
 
