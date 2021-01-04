@@ -348,3 +348,6 @@ RegisterTargets",
 | ELBv2 | No EC2 instance is public in dev accounts via ELBv2| De-registers the instance | - |
 | IAM ROLE | No IAM Role should be publicly exposed | Update the Trust Relationship | - |
 | LAMBDA | No Lambda should be publicly exposed | Update the resource policy | - |
+| ECS | ECS Service is public | Update service with 'assignPublicIp':'DISABLED | - |
+| ECS | ECS Task is public | Stop the task | - |
+| ECS | ECS Task Set is public | Delete the Task Set | - |
