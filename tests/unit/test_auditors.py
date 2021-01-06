@@ -1253,6 +1253,49 @@ class TestAuditors(TestCase):
                 def update_service(self, **kwargs):
                     return True
 
+            class Kms():
+                def get_key_policy(self, **kwargs):
+                    policy = {"Policy":"{\n\"Version\" : \"2012-10-17\",\n\"Id\" : \"key-default-1\",\n\"Statement\" : [ {\n    \"Sid\" : \"Enable IAM User Permissions\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n        \"AWS\" : \"*\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n} ]\n}"}
+
+                    return policy
+
+                def list_key_policies(self, **kwargs):
+                    policy_list = {
+                        "NextMarker": "string",
+                        "PolicyNames": [ "string" ],
+                        "Truncated": False
+                    }
+                    return policy_list
+
+                def describe_key(self, **kwargss):
+                    key_description = {
+                    "KeyMetadata": {
+                        "AWSAccountId": "111122223333",
+                        "Arn": "arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
+                        "CreationDate": 1.499288695918E9,
+                        "Description": "",
+                        "Enabled": True,
+                        "KeyId": "1234abcd-12ab-34cd-56ef-1234567890ab",
+                        "KeyManager": "CUSTOMER",
+                        "KeyState": "Enabled",
+                        "KeyUsage": "ENCRYPT_DECRYPT",
+                        "Origin": "AWS_KMS",
+                        "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+                        "EncryptionAlgorithms": [
+                            "SYMMETRIC_DEFAULT"
+                        ]
+                    }
+                    }
+                    return key_description
+
+                def list_keys(self, **kwargs):
+                    keys = {}
+                    return keys
+
+                def put_key_policy(self, **kwargs):
+                    return True
+
+
             if service == "ec2":
                 return Ec2()
             elif service == "sqs":
@@ -1279,6 +1322,8 @@ class TestAuditors(TestCase):
                 return Lambda()
             elif service == "ecs":
                 return Ecs()
+            elif service == "kms":
+                return Kms()
             else:
                 raise Exception("Unknown service: {}".format(service))
 
@@ -1717,3 +1762,15 @@ class TestAuditors(TestCase):
         assert_true(ecs_task_set.audit(resource_message, remediate=True))
         resource_message["id"] = "good"
         assert_true(ecs_task_set.audit(resource_message, remediate=True))
+
+    def test_kms_key(self):
+        from resources.remediator.auditors import kms_key
+        resource_message = {
+            "account": "123456789012",
+            "region": "us-east-1",
+            "type": "kms_key",
+            "id": "bad",
+        }
+        assert_true(kms_key.audit(resource_message, remediate=True))
+        resource_message["id"] =  "good"
+        assert_true(kms_key.audit(resource_message, remediate=True))

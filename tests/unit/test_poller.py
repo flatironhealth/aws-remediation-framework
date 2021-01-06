@@ -102,6 +102,20 @@ class TestPoller(TestCase):
                 def can_paginate(self, method):
                     return False
 
+            class Kms:
+                def list_keys(self, **kwargs):
+                    return {"Keys": []}
+                def get_key_policy(self, **kwargs):
+                    return {"KeyPolicy": []}
+
+                def list_key_policies(self, **kwargs):
+                    return {"KeyPolicies": []}
+
+                def describe_key(self, **kwargs):
+                    return {"Key": []}
+
+                def can_paginate(self, method):
+                    return False
 
             if service == "sqs":
                 return Sqs()
@@ -121,6 +135,8 @@ class TestPoller(TestCase):
                 return Lambda()
             elif service == "ecs":
                 return Ecs()
+            elif service == "kms":
+                return Kms()
             else:
                 raise Exception("Unknown service: {}".format(service))
 

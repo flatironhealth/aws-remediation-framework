@@ -158,7 +158,14 @@ data "aws_iam_policy_document" "member_remediator_policy_document" {
       "ecs:CreateService",
       "ecs:CreateCluster",
       "ecs:PutAttributes",
-      "ecs:StopTask"
+      "ecs:StopTask",
+
+      # KMS
+      "kms:DescribeKey",
+      "kms:ListKeys",
+      "kms:ListKeyPolicies",
+      "kms:GetKeyPolicy",
+      "kms:PutKeyPolicy"
 
     ]
     resources = [

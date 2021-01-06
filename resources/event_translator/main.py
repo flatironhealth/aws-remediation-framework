@@ -257,6 +257,15 @@ def translate_event(event):
         resource["id"] = event["detail"]["requestParameters"]["taskDefinition"]
         return [resource]
 
+    elif eventName == "PutKeyPolicy":
+        resource["type"] = "kms_key"
+        resource["id"] = event["detail"]["requestParameters"]["keyId"]
+        return [resource]
+
+    elif eventName == "CreateKey":
+        resource["type"] = "kms_key"
+        resource["id"] = event["detail"]["responseElements"]["keyMetadata"]["keyId"]
+        return [resource]
 
     else:
         raise Exception("Unexpected event: {}".format(eventName))

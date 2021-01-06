@@ -552,7 +552,35 @@ def main():
                             "ecs_task",
                             task["taskDefinitionArn"],
                         ),
-                    )   
+                    )
+
+            ## Look at KMS
+            kms =  get_session_for_account(account_id, region, "kms")
+            all_keys = paginate_call(kms, "list_keys", {}) ## this returns a LIST of {"KeyARN": KeyARN, "KeyId": KeyId}
+            for key in all_keys.get("Keys", []):
+                if only_use_test_resources:
+                    if "misconfig" in key["KeyId"]:
+                        output_resource(
+                            sqs_for_output,
+                            sqs_output,
+                            Resource(
+                                account_id,
+                                region,
+                                "kms_key",
+                                key["KeyId"],
+                            ),
+                        )
+                else:
+                    output_resource(
+                        sqs_for_output,
+                        sqs_output,
+                        Resource(
+                            account_id,
+                            region,
+                            "kms_key",
+                            key["KeyId"],
+                        ),
+                    )
 
             # Look at Region
             output_resource(

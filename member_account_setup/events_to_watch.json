@@ -49,7 +49,11 @@
       "CreateTaskSet",
       "UpdateTaskSet",
       "RunTask",
-      "StartTask"
+      "StartTask",
+
+      "CreateKey",
+      "PutKeyPolicy"
+
     ]
   }
 }

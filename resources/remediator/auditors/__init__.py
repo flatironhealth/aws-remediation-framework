@@ -9,6 +9,7 @@ __all__ = [
     "elbv2",
     "iam_role",
     "iam_user",
+    "kms_key",
     "lambda_function",
     "rds",
     "rds_snapshot",
